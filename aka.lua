@@ -1,4 +1,3 @@
-local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 
 -- 플레이어와 캐릭터 가져오기
@@ -179,27 +178,26 @@ local function deactivateEffects()
     -- Rate를 초기값으로 복구
     sparks1.Rate = 200
     charge.Rate = 200
-    sparks2.Rate = 50
+    sparks2.Rate = 500
 end
 
 -- 재생 중 플래그
 local isPlaying = false
 
--- E 키 입력 감지 (LapseBlueMax 형식)
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if not gameProcessedEvent and not isPlaying then
-        if input.KeyCode == Enum.KeyCode.E then
-            isPlaying = true
-            -- 이펙트 활성화
-            activateEffects()
-            -- 5초 후 비활성화
-            task.delay(1, function()
-                deactivateEffects()
-                isPlaying = false
-            end)
-        end
+-- 이펙트를 자동으로 활성화하는 함수
+local function autoActivateEffects()
+    if not isPlaying then
+        isPlaying = true
+        activateEffects()
+        task.delay(1, function()
+            deactivateEffects()
+            isPlaying = false
+        end)
     end
-end)
+end
+
+-- 스크립트 시작 시 이펙트 자동 활성화
+autoActivateEffects()
 
 -- 캐릭터 리셋 시 이펙트 다시 설정
 player.CharacterAdded:Connect(function(newCharacter)
@@ -214,4 +212,7 @@ player.CharacterAdded:Connect(function(newCharacter)
     
     -- 이펙트 비활성화 상태로 초기화
     deactivateEffects()
+    
+    -- 캐릭터 리셋 후 이펙트 자동 활성화
+    autoActivateEffects()
 end)
